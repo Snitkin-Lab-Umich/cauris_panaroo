@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#SBATCH --mail-user=jjhale@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=20g
+#SBATCH --time=45:00:00
+
+module load singularity
+#singularity exec orthofinder_latest_10-10-24.sif orthofinder -f test60/ -S diamond_ultra_sens -t 16
+#singularity exec orthofinder_latest_10-10-24.sif orthofinder -f test60/ -t 16
+singularity exec ../orthofinder/orthofinder_latest_10-10-24.sif orthofinder -f 043025_shortread/protein_fasta_nodup/ -t 16

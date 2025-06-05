@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#SBATCH --mail-user=jjhale@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=15g
+#SBATCH --time=36:00:00
+
+module load singularity
+#singularity exec panaroo_latest_10-16-24.sif panaroo -i sra_t60_prokka_gff/*.gff -o sra_t60_out/ --clean-mode moderate --remove-invalid-genes
+#singularity exec --bind ./panaroo_data/:/opt/conda/lib/python3.9/site-packages/panaroo/ panaroo_1-5-1.sif panaroo -i sra_t60_prokka_gff/*.gff -o sra_t60_out/ --clean-mode moderate --remove-invalid-genes
+#singularity exec ../panaroo/panaroo_1-5-1.sif panaroo -i 040825_shortread/prokka_gff_nodup/*.gff -o 040825_shortread/panaroo_out_v1/ --clean-mode moderate --remove-invalid-genes
+
+singularity exec ../panaroo/panaroo_1-5-1.sif panaroo -i 043025_shortread/prokka_gff_nodup/*.gff -o 043025_shortread/panaroo_out_v2/ --clean-mode moderate --remove-invalid-genes -a core
+

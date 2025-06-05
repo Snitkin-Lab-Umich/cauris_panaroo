@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#SBATCH --mail-user=jjhale@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=5g
+#SBATCH --time=02:00:00
+
+# biopython conda env is needed (for gffutils)
+#python3.12 panaroo_scripts/convert_wrapper.py
+#python3.12 panaroo_scripts/genedata/make_genedata.py
+python3.12 panaroo_scripts/genedata/make_annotation_key.py
