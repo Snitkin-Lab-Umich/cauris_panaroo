@@ -1,6 +1,7 @@
 import os
 import subprocess
 from Bio import SeqIO
+import argparse
 
 def convert_all(gff_in,fasta_in,output_dir):
     for fname in os.listdir(gff_in):
@@ -23,7 +24,7 @@ def get_gff_line_ID(linelist):
     return(cdsname)
     
 
-def remove_duplicate_entries(gff_in,gff_out_dir,fasta_in,fasta_out_dir):
+def remove_duplicate_entries(gff_in,gff_out_dir,fasta_in,fasta_out_dir,include_ortho):
     for fname in os.listdir(gff_in):
         isolatename = fname.split('.gff')[0]
         with open(f'{gff_in}{fname}','r') as fh_in,open(f'{gff_out_dir}{fname}','w') as fh_out:
@@ -45,26 +46,42 @@ def remove_duplicate_entries(gff_in,gff_out_dir,fasta_in,fasta_out_dir):
                     n.add(d)
                 _ = fh_out.write(line)
         # with this info, remove the same entries from the orthofinder fastas
-        with open(f'{fasta_in}{isolatename}.proteins.fa','r') as fh_in,open(f'{fasta_out_dir}{isolatename}.proteins.fa','w') as fh_out:
-            towrite = []
-            for record in SeqIO.parse(fh_in,'fasta'):
-                genename = record.id.split('-T')[0]
-                if genename not in toremove:
-                    towrite.append(record)
-            SeqIO.write(towrite,fh_out,'fasta')
-                
+        if include_ortho:
+            with open(f'{fasta_in}{isolatename}.proteins.fa','r') as fh_in,open(f'{fasta_out_dir}{isolatename}.proteins.fa','w') as fh_out:
+                towrite = []
+                for record in SeqIO.parse(fh_in,'fasta'):
+                    genename = record.id.split('-T')[0]
+                    if genename not in toremove:
+                        towrite.append(record)
+                SeqIO.write(towrite,fh_out,'fasta')
 
-
-
-if __name__ == '__main__':
-    gff_in = '043025_shortread/original_gff/'
-    fasta_in = '043025_shortread/original_nucleotide_fasta/'
-    fasta_protein_in = '043025_shortread/original_protein_fasta/'
-    output_dir1 = '043025_shortread/prokka_gff_withdup/'
-    output_dir2 = '043025_shortread/prokka_gff_nodup/'
-    output_dir3 = '043025_shortread/protein_fasta_nodup/'
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--input','-i',type=str,
+        help='''Provide the name of a directory containing the assemblies and annotation files. The gff files should be in [input]/original_gff,
+        and the assemblies should be in [input]/original_nucleotide_fasta''',
+        default=None
+        )
+    parser.add_argument(
+        '--ortho','-o',action='store_true',
+        help='''Provide the name of a directory containing the assemblies and annotation files. The gff files should be in [input]/original_gff,
+        and the assemblies should be in [input]/original_nucleotide_fasta''',
+        default=False
+        )
+    args = parser.parse_args()
+    gff_in = f'{args.input}/original_gff/'
+    fasta_in = f'{args.input}/original_nucleotide_fasta/'
+    fasta_protein_in = f'{args.input}/original_protein_fasta/'
+    output_dir1 = f'{args.input}/prokka_gff_withdup/'
+    output_dir2 = f'{args.input}/prokka_gff_nodup/'
+    output_dir3 = f'{args.input}/protein_fasta_nodup/'
     for p in [output_dir1,output_dir2,output_dir3]:
         if not os.path.exists(p):
             os.mkdir(p)
     convert_all(gff_in,fasta_in,output_dir1)
-    remove_duplicate_entries(output_dir1,output_dir2,fasta_protein_in,output_dir3)
+    remove_duplicate_entries(output_dir1,output_dir2,fasta_protein_in,output_dir3,args.ortho)
+
+
+if __name__ == '__main__':
+    main()
