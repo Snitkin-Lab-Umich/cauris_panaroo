@@ -1,5 +1,7 @@
 import os
+import argparse
 from Bio import SeqIO
+
 
 def change_names_paralogskip(input_dir,output_dir):
     for fname in os.listdir(input_dir):
@@ -28,10 +30,27 @@ def change_names(input_dir,output_dir):
                         line = line.split(';')[0] + '\n'
                     _ = fh_out.write(line)
 
+def main():
+    # define all args
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--input','-i',type=str,
+        help='''Provide a path to a panaroo-msa output directory. Files should all end in .aln.fas''',
+        required=True
+        )
+    parser.add_argument(
+        '--output','-o',type=str,
+        help='''Provide an output directory for the renamed fasta files.''',
+        required=True
+        )
+    args = parser.parse_args()
+    if not os.path.isdir(args.output):
+        os.makedirs(args.output)
+    change_names_paralogskip(args.input, args.output)
+
+
 if __name__ == '__main__':
-    input_dir = '043025_shortread/panaroo_out_v1/aligned_gene_sequences/'
-    output_dir = '043025_shortread/panaroo_out_v1/aligned_gene_sequences_rename/'
-    change_names_paralogskip(input_dir,output_dir)
+    main()
     ## this script is meant to rename the output files from panaroo-msa, removing the numbers after the semicolon
     ## currently, this will also remove any paralogs from the msa file
     ## obviously, this is not ideal, but it allows it to work with IQTREE
