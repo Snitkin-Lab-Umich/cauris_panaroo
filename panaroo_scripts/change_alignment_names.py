@@ -32,3 +32,6 @@ if __name__ == '__main__':
     input_dir = '043025_shortread/panaroo_out_v1/aligned_gene_sequences/'
     output_dir = '043025_shortread/panaroo_out_v1/aligned_gene_sequences_rename/'
     change_names_paralogskip(input_dir,output_dir)
+    ## this script is meant to rename the output files from panaroo-msa, removing the numbers after the semicolon
+    ## currently, this will also remove any paralogs from the msa file
+    ## obviously, this is not ideal, but it allows it to work with IQTREE
