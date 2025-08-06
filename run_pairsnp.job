@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#SBATCH --mail-user=jjhale@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=5g
+#SBATCH --time=05:00:00
+
+# activate biopython before running
+
+# python panaroo_scripts/pairsnp.py -i 060525_shortread/panaroo_out_v1/aligned_gene_sequences/ -o 060525_shortread/panaroo_out_v1/pairsnp/
+
+
+# biopython not needed here
+#module load python/3.10.4
+#module load pandas/1.4.2
+
+#python panaroo_scripts/summarize_pairsnp.py -i 060525_shortread/panaroo_out_v1/pairsnp/ -o 060525_shortread/panaroo_out_v1/pairsnp/pairsnp_summary_v2.tsv -q /nfs/turbo/umms-esnitkin/Project_Cauris/Sequence_data/illumina_fastq/master_qc_summary.csv
+
+#python3.10 panaroo_scripts/summarize_pairsnp.py -i test/ -o test/pairsnp_summary_v1.tsv -q /nfs/turbo/umms-esnitkin/Project_Cauris/Sequence_data/illumina_fastq/master_qc_summary.csv
+
+
+# normalize the output files and remake the summary
+#python panaroo_scripts/pairsnp.py -i 060525_shortread/panaroo_out_v1/aligned_gene_sequences/ -o 060525_shortread/panaroo_out_v1/pairsnp/ -n 060525_shortread/panaroo_out_v1/norm_pairsnp/ -s
+python panaroo_scripts/summarize_pairsnp.py -i 060525_shortread/panaroo_out_v1/norm_pairsnp/ -o 060525_shortread/panaroo_out_v1/pairsnp/pairsnp_summary_v4.tsv -q /nfs/turbo/umms-esnitkin/Project_Cauris/Sequence_data/illumina_fastq/master_qc_summary.csv -n
+
