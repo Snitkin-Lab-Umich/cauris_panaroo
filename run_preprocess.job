@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#SBATCH --mail-user=jjhale@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=15g
+#SBATCH --time=15:00:00
+
+# gffutils and biopython required
+
+python panaroo_scripts/convert_wrapper.py \
+    --assemblies /nfs/turbo/umms-esnitkin/Project_Cauris/Sequence_data/assembly/illumina/funannotate/ \
+    --output 092525_pangenome_results
+
+

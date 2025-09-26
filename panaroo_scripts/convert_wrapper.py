@@ -133,7 +133,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--assemblies','-a',type=str,
-        help='''Provide the name of a directory containing funannotate outputs for all isolates.''',
+        help='''Provide the name of a directory containing funannotate outputs for all isolates. This should be in the same format as 
+        cauris-data-flow's funannotate directory.''',
         default=None
         )
     parser.add_argument(
@@ -179,7 +180,7 @@ def main():
                     print(f'Could not locate expected file {source_file}')
                     continue
                 subprocess.run(['cp',source_file,dest])
-        print(f'Finished copying files from {args.assemblies} to output directory {args.input}.')
+        print(f'Finished copying files from {args.assemblies} to output directory {args.output}')
     gff_introns_removed = os.path.join(args.output,'original_gff_NoIntrons')
     gff_final = os.path.join(args.output,'prokka_gff')
     logfile = os.path.join(log_dir,'intron_removal_log.txt')

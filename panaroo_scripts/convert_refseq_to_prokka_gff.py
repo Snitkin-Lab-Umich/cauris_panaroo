@@ -1,3 +1,7 @@
+# This is an exact copy of the convert_refseq_to_prokka_gff.py script from Panaroo
+# Found at: https://github.com/gtonkinhill/panaroo
+# It is included here to allow the initial preprocessing of gff files before running panaroo, with small edits if needed
+
 import sys, os
 import argparse
 import gffutils as gff
