@@ -20,5 +20,11 @@ module load singularity
 #singularity exec ../panaroo/panaroo_1-5-1.sif panaroo -i 060525_shortread/prokka_gff_nodup/*.gff -o 060525_shortread/panaroo_out_v1/ --clean-mode moderate --remove-invalid-genes --merge_paralogs
 
 # output msa files
-singularity exec ../panaroo/panaroo_1-5-1.sif panaroo-msa --out_dir 060525_shortread/panaroo_out_v1/ --threads 8 --alignment pan --verbose
+#singularity exec ../panaroo/panaroo_1-5-1.sif panaroo-msa --out_dir 060525_shortread/panaroo_out_v1/ --threads 8 --alignment pan --verbose
 
+
+# run panaroo on MDHHS samples
+# (make sure to use the biopython conda env for gffutils first)
+#python3.12 panaroo_scripts/convert_wrapper.py --input 082625_mdhhs_quickbatch
+#singularity exec panaroo_1-5-1.sif panaroo -i 082625_mdhhs_quickbatch/prokka_gff_nodup/*.gff -o 082625_mdhhs_quickbatch/panaroo_out_v1/ --clean-mode moderate --remove-invalid-genes --merge_paralogs --threads 8
+singularity exec panaroo_1-5-1.sif panaroo-msa --out_dir 082625_mdhhs_quickbatch/panaroo_out_v1/ --threads 8 --alignment core --verbose

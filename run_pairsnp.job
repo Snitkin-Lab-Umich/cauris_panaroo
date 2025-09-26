@@ -8,7 +8,7 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=5g
-#SBATCH --time=05:00:00
+#SBATCH --time=08:00:00
 
 # activate biopython before running
 
@@ -26,5 +26,9 @@
 
 # normalize the output files and remake the summary
 #python panaroo_scripts/pairsnp.py -i 060525_shortread/panaroo_out_v1/aligned_gene_sequences/ -o 060525_shortread/panaroo_out_v1/pairsnp/ -n 060525_shortread/panaroo_out_v1/norm_pairsnp/ -s
-python panaroo_scripts/summarize_pairsnp.py -i 060525_shortread/panaroo_out_v1/norm_pairsnp/ -o 060525_shortread/panaroo_out_v1/pairsnp/pairsnp_summary_v4.tsv -q /nfs/turbo/umms-esnitkin/Project_Cauris/Sequence_data/illumina_fastq/master_qc_summary.csv -n
+#python panaroo_scripts/summarize_pairsnp.py -i 060525_shortread/panaroo_out_v1/norm_pairsnp/ -o 060525_shortread/panaroo_out_v1/pairsnp/pairsnp_summary_v4.tsv -q /nfs/turbo/umms-esnitkin/Project_Cauris/Sequence_data/illumina_fastq/master_qc_summary.csv -n
 
+# run the msa_unique script as well
+python panaroo_scripts/msa_unique.py -i 060525_shortread/panaroo_out_v1/aligned_gene_sequences/ -o 060525_shortread/panaroo_out_v1/unique_variants/
+
+python panaroo_scripts/summarize_unique.py -i 060525_shortread/panaroo_out_v1/unique_variants/ -o 060525_shortread/panaroo_out_v1/unique_variant_summary_v1.tsv -q /nfs/turbo/umms-esnitkin/Project_Cauris/Sequence_data/illumina_fastq/master_qc_summary.csv
