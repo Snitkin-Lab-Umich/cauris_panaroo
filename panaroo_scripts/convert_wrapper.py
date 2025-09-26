@@ -31,15 +31,16 @@ def remove_intron_genes(gff_input_dir,gff_output_dir,logfile):
     # if there's only one, keep that CDS feature
     # if there's more than one, skip that gene entirely, and record the number of genes skipped
     # also ensure that all CDS features have unique IDs
-    with open(logfile,'w') as fh_log:
+    with open(logfile,'a') as fh_log:
         for fname in os.listdir(gff_input_dir):
             if '.gff' not in fname:
                 continue
             isolatename = fname.split('.gff')[0]
-            gff_db = gff.create_db(fh_in, dbfn=':memory:', force=True, keep_order=True, merge_strategy='create_unique', sort_attribute_values=True)
+            gff_file = os.path.join(gff_input_dir,fname)
+            gff_db = gff.create_db(gff_file, dbfn=':memory:', force=True, keep_order=True, merge_strategy='create_unique', sort_attribute_values=True)
             removed_intron_count,retained_count = 0,0
             cds_ids = set()
-            with open(f'{gff_output_dir}{isolatename}.gff3','w') as fh_out:
+            with open(os.path.join(gff_output_dir,f'{isolatename}.gff3'),'w') as fh_out:
                 _ = fh_out.write('##gff-version 3\n')
                 for gene in gff_db.features_of_type('gene'):
                     #gene_id = get_gff_line_ID(gene.attributes['ID'])
@@ -57,7 +58,7 @@ def remove_intron_genes(gff_input_dir,gff_output_dir,logfile):
                     else:
                         removed_intron_count += 1
             total_genes_processed = removed_intron_count + retained_count
-            _ = fh_log.write(f'Removed {removed_intron_count} genes with multiple CDS features of {total_cds_processed} total genes in {isolatename}')
+            _ = fh_log.write(f'Removed {removed_intron_count} genes with multiple CDS features of {total_genes_processed} total genes in {isolatename}\n')
 
 
 def splice_introns(gff_input_dir,gff_output_dir):
@@ -129,12 +130,31 @@ def remove_duplicate_entries(gff_in,gff_out_dir,fasta_in,fasta_out_dir,include_o
                         towrite.append(record)
                 SeqIO.write(towrite,fh_out,'fasta')
 
+def copy_data(isolate,annotate_results_dir,gff_input,nucl_fasta_input,prot_fasta_input):
+    if not os.path.isdir(annotate_results_dir):
+        print(f'Could not locate annotation results for {isolate} at {annotate_results_dir}')
+        return
+    for suff,dest in [['.gff3',gff_input],['.scaffolds.fa',nucl_fasta_input],['.proteins.fa',prot_fasta_input]]:
+        source_file = os.path.join(annotate_results_dir,f'{isolate}{suff}')
+        if not os.path.isfile(source_file):
+            print(f'Could not locate expected file {source_file}')
+            return
+        subprocess.run(['cp',source_file,dest])
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--assemblies','-a',type=str,
         help='''Provide the name of a directory containing funannotate outputs for all isolates. This should be in the same format as 
         cauris-data-flow's funannotate directory.''',
+        default=None
+        )
+    parser.add_argument(
+        '--additional-assemblies','-aa',type=str,
+        help='''Provide the name of a directory containing funannotate outputs for all isolates. This should be in the same format as 
+        cauris-data-flow's funannotate directory. This option is intended for adding hybrid assemblies, and will overwrite the files provided 
+        in --assemblies if they share the same name.''',
         default=None
         )
     parser.add_argument(
@@ -170,16 +190,15 @@ def main():
             if not os.path.exists(p):
                 os.mkdir(p)
         for isolate in os.listdir(args.assemblies):
-            isolate_path = os.path.join(args.assemblies,isolate,'annotate_results')
-            if not os.path.isdir(isolate_path):
-                print(f'Could not locate annotation results for isolate {isolate} at {isolate_path}')
-                continue
-            for suff,dest in [['.gff3',gff_input],['.scaffolds.fa',nucl_fasta_input],['.proteins.fa',prot_fasta_input]]:
-                source_file = os.path.join(isolate_path,f'{isolate}{suff}')
-                if not os.path.isfile(source_file):
-                    print(f'Could not locate expected file {source_file}')
-                    continue
-                subprocess.run(['cp',source_file,dest])
+            isolate_annotate_results = os.path.join(args.assemblies,isolate,'annotate_results')
+            copy_data(isolate,isolate_annotate_results,gff_input,nucl_fasta_input,prot_fasta_input)
+        if args.additional_assemblies is not None:
+            if not os.path.isdir(args.additional_assemblies):
+                print(f'Could not locate input directory at {args.additional_assemblies}')
+                quit(1)
+            for isolate2 in os.listdir(args.additional_assemblies):
+                isolate_additional_annotate_results = os.path.join(args.additional_assemblies,isolate2,'annotate_results')
+                copy_data(isolate2,isolate_additional_annotate_results,gff_input,nucl_fasta_input,prot_fasta_input)
         print(f'Finished copying files from {args.assemblies} to output directory {args.output}')
     gff_introns_removed = os.path.join(args.output,'original_gff_NoIntrons')
     gff_final = os.path.join(args.output,'prokka_gff')
@@ -187,6 +206,9 @@ def main():
     for p in [gff_introns_removed,gff_final,log_dir]:
         if not os.path.exists(p):
             os.mkdir(p)
+    # write a single line to the log file to initialize
+    with open(logfile,'w') as fh_log:
+        _ = fh_log.write('Intron and duplicate removal log\n')
     remove_intron_genes(gff_input,gff_introns_removed,logfile)
     convert_all(gff_introns_removed,nucl_fasta_input,gff_final)
 
