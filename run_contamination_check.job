@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#SBATCH --mail-user=jjhale@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=45g
+#SBATCH --time=15:00:00
+
+module load Bioinformatics bwa/0.7.17-mil4ns7 samtools/1.21
+
+python panaroo_scripts/calculate_scaffold_coverage.py --input contamination_check/contamination_genes_v1.csv --assemblies 092525_pangenome_results/original_nucleotide_fasta/ \
+    --raw-reads /nfs/turbo/umms-esnitkin/Project_Cauris/Sequence_data/illumina_fastq/clean_fastq_qc_pass_samples/ \
+    --raw-reads-extra /nfs/turbo/umms-esnitkin/Project_Cauris/Public_datasets/2025-07-10_MDHHS/illumina/clean_fastq_qc_pass_samples/ \
+    --output contamination_check/
+

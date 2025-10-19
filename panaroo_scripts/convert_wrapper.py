@@ -7,9 +7,12 @@ import gffutils as gff
 def convert_all(gff_in,fasta_in,output_dir):
     for fname in os.listdir(gff_in):
         fname2 = fname.split('.gff3')[0]
-        gff_file = gff_in + fname2 + '.gff3'
-        fasta_file = fasta_in + fname2 + '.scaffolds.fa'
-        outfile = output_dir + fname2 + '.gff'
+        gff_file = os.path.join(gff_in, fname2 + '.gff3')
+        fasta_file = os.path.join(fasta_in, fname2 + '.scaffolds.fa')
+        outfile = os.path.join(output_dir, fname2 + '.gff')
+        #gff_file = gff_in + fname2 + '.gff3'
+        #fasta_file = fasta_in + fname2 + '.scaffolds.fa'
+        #outfile = output_dir + fname2 + '.gff'
         command = ['python3.12','panaroo_scripts/convert_refseq_to_prokka_gff.py','--gff',gff_file,'--fasta',fasta_file,'--out',outfile]
         subprocess.run(command)
 

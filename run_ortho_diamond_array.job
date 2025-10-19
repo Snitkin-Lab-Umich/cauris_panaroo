@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#SBATCH --mail-user=jjhale@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin3
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=5g
+#SBATCH --time=48:00:00
+#SBATCH --array=101-164
+
+# orthofinder v3 conda env required
+
+# bash 092525_pangenome_results/orthofinder_commands/700subset/split_commands/split_ortho_command_$(printf "%03d" $((SLURM_ARRAY_TASK_ID * 3 + 1))).txt
+# bash 092525_pangenome_results/orthofinder_commands/700subset/split_commands/split_ortho_command_$(printf "%03d" $((SLURM_ARRAY_TASK_ID * 3 + 2))).txt
+# bash 092525_pangenome_results/orthofinder_commands/700subset/split_commands/split_ortho_command_$(printf "%03d" $((SLURM_ARRAY_TASK_ID * 3 + 2))).txt
+
+
+# for each job in the array, run 3 jobs from in sequence from the list of split command files
+# within each text file, replace METHODTHREAD with the desired number of threads
+sed 's/METHODTHREAD/1/g' 092525_pangenome_results/orthofinder_commands/700subset/split_commands/split_ortho_command_$(printf "%03d" $((SLURM_ARRAY_TASK_ID * 3 + 0))).txt | bash
+sed 's/METHODTHREAD/1/g' 092525_pangenome_results/orthofinder_commands/700subset/split_commands/split_ortho_command_$(printf "%03d" $((SLURM_ARRAY_TASK_ID * 3 + 1))).txt | bash
+sed 's/METHODTHREAD/1/g' 092525_pangenome_results/orthofinder_commands/700subset/split_commands/split_ortho_command_$(printf "%03d" $((SLURM_ARRAY_TASK_ID * 3 + 2))).txt | bash

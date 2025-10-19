@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#SBATCH --mail-user=jjhale@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=20g
+#SBATCH --time=05:00:00
+
+python panaroo_scripts/check_rare_genes.py --location 092525_pangenome_results/prokka_gff/ --gene-families 092525_pangenome_results/subset700_data/location_check/gene_presence_absence_processed_names_v2.csv \
+--rare-genes 092525_pangenome_results/subset700_data/location_check/rare_gene_families_list.csv --gml 092525_pangenome_results/panaroo_out_v1/final_graph.gml \
+--output 092525_pangenome_results/subset700_data/location_check/rare_gene_neighbors.csv
+
+

@@ -3,11 +3,11 @@
 #SBATCH --mail-user=jjhale@umich.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --export=ALL
-#SBATCH --partition=standard
+#SBATCH --partition=largemem
 #SBATCH --account=esnitkin1
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=100g
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=500g
 #SBATCH --time=48:00:00
 
 #module load singularity
@@ -40,5 +40,4 @@
 # --lines=1000 -d --additional-suffix=.txt -a 3
 
 # run orthofinder using the pre-computed DIAMOND results
-# only run orthofinder up to the inference of orthogroups, not the full tree construction
-orthofinder -t 16 -a 16 -b 092525_pangenome_results/orthofinder_out_subset700_v2/Results_Oct04/WorkingDirectory/ -og
+orthofinder -t 32 -a 32 -b 092525_pangenome_results/orthofinder_out_subset700_v2/Results_Oct04/WorkingDirectory/

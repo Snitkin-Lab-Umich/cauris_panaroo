@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#SBATCH --mail-user=jjhale@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=5g
+#SBATCH --time=36:00:00
+
+# orthofinder v3 conda env required
+
+# replace METHODTHREAD in each command with the desired number of threads
+sed 's/METHODTHREAD/1/g' 092525_pangenome_results/orthofinder_commands/700subset/split_commands/split_ortho_command_137.txt | bash

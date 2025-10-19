@@ -6,9 +6,9 @@
 #SBATCH --partition=standard
 #SBATCH --account=esnitkin1
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=15g
-#SBATCH --time=48:00:00
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=75g
+#SBATCH --time=10:00:00
 
 module load singularity
 #singularity exec panaroo_latest_10-16-24.sif panaroo -i sra_t60_prokka_gff/*.gff -o sra_t60_out/ --clean-mode moderate --remove-invalid-genes
@@ -27,4 +27,17 @@ module load singularity
 # (make sure to use the biopython conda env for gffutils first)
 #python3.12 panaroo_scripts/convert_wrapper.py --input 082625_mdhhs_quickbatch
 #singularity exec panaroo_1-5-1.sif panaroo -i 082625_mdhhs_quickbatch/prokka_gff_nodup/*.gff -o 082625_mdhhs_quickbatch/panaroo_out_v1/ --clean-mode moderate --remove-invalid-genes --merge_paralogs --threads 8
-singularity exec panaroo_1-5-1.sif panaroo-msa --out_dir 082625_mdhhs_quickbatch/panaroo_out_v1/ --threads 8 --alignment core --verbose
+#singularity exec panaroo_1-5-1.sif panaroo-msa --out_dir 082625_mdhhs_quickbatch/panaroo_out_v1/ --threads 8 --alignment core --verbose
+
+# run panaroo on the new dataset of 1500 genomes
+#singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/prokka_gff/*.gff -o 092525_pangenome_results/panaroo_out_v1 --clean-mode moderate --remove-invalid-genes --merge_paralogs --threads 16
+# output msa files for this run
+#singularity exec panaroo_1-5-1.sif panaroo-msa --out_dir 092525_pangenome_results/panaroo_out_v1/ --threads 16 --alignment pan --verbose
+
+# run panaroo on the subset of 700 genomes, using the intron-spliced gff files
+singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/prokka_gff_spliceIntrons/*.gff \
+-o 092525_pangenome_results/panaroo_out_v2_spliceIntrons/ --clean-mode moderate --remove-invalid-genes --merge_paralogs --threads 16
+
+
+
+
