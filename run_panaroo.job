@@ -6,9 +6,9 @@
 #SBATCH --partition=standard
 #SBATCH --account=esnitkin1
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=75g
-#SBATCH --time=10:00:00
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=50g
+#SBATCH --time=48:00:00
 
 module load singularity
 #singularity exec panaroo_latest_10-16-24.sif panaroo -i sra_t60_prokka_gff/*.gff -o sra_t60_out/ --clean-mode moderate --remove-invalid-genes
@@ -35,9 +35,13 @@ module load singularity
 #singularity exec panaroo_1-5-1.sif panaroo-msa --out_dir 092525_pangenome_results/panaroo_out_v1/ --threads 16 --alignment pan --verbose
 
 # run panaroo on the subset of 700 genomes, using the intron-spliced gff files
-singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/prokka_gff_spliceIntrons/*.gff \
--o 092525_pangenome_results/panaroo_out_v2_spliceIntrons/ --clean-mode moderate --remove-invalid-genes --merge_paralogs --threads 16
+#singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/prokka_gff_spliceIntrons/*.gff \
+#-o 092525_pangenome_results/panaroo_out_v2_spliceIntrons/ --clean-mode moderate --remove-invalid-genes --merge_paralogs --threads 16
 
+# run panaroo on the subset of 700 genomes, using the intron-removed gff files
+#singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/prokka_gff_removeIntrons/*.gff \
+#-o 092525_pangenome_results/panaroo_out_v2_removeIntrons/ --clean-mode moderate --remove-invalid-genes --merge_paralogs --threads 16
 
-
+# output msa files for the intron-spliced run of panaroo
+singularity exec panaroo_1-5-1.sif panaroo-msa --out_dir 092525_pangenome_results/panaroo_out_v2_spliceIntrons/ --threads 8 --alignment pan --verbose
 

@@ -43,6 +43,8 @@ def remove_intron_genes(gff_input_dir,gff_output_dir,logfile):
             gff_db = gff.create_db(gff_file, dbfn=':memory:', force=True, keep_order=True, merge_strategy='create_unique', sort_attribute_values=True)
             removed_intron_count,retained_count = 0,0
             cds_ids = set()
+            # also track cds locations to ensure uniqueness
+            cds_locations = set()
             with open(os.path.join(gff_output_dir,f'{isolatename}.gff3'),'w') as fh_out:
                 _ = fh_out.write('##gff-version 3\n')
                 #for gene in gff_db.features_of_type('gene'):
@@ -55,12 +57,17 @@ def remove_intron_genes(gff_input_dir,gff_output_dir,logfile):
                         # since merge_strategy='create_unique' was used, cds.id will have a suffix such as _1 or _2 added
                         # cds.attributes['ID'][0] will be the original ID from the gff file, which is the same for all cds features under the same mRNA
                         cds = cds_list[0]
+                        cds_loc = (cds.seqid, cds.start, cds.end)
                         if cds.attributes['ID'][0] in cds_ids:
                             print(f'Error: duplicate CDS ID {cds.attributes["ID"][0]} found in {isolatename}!')
                             quit(1)
+                        elif cds_loc in cds_locations:
+                            print(f'Warning: skipping a duplicate CDS location for {cds.attributes["ID"][0]}, found in {isolatename}')
+                            continue
                         else:
                             _ = fh_out.write(str(cds_list[0]) + '\n')
                             cds_ids.add(cds.attributes['ID'][0])
+                            cds_locations.add(cds_loc)
                             retained_count += 1
                     else:
                         removed_intron_count += 1
