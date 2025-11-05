@@ -8,7 +8,7 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=50g
-#SBATCH --time=48:00:00
+#SBATCH --time=24:00:00
 
 module load singularity
 #singularity exec panaroo_latest_10-16-24.sif panaroo -i sra_t60_prokka_gff/*.gff -o sra_t60_out/ --clean-mode moderate --remove-invalid-genes
@@ -48,8 +48,33 @@ module load singularity
 
 
 # run panaroo on the dataset that includes haemuli outgroups
-singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/outgroup_data/prokka_gff_spliceIntrons/*.gff \
--o 092525_pangenome_results/outgroup_data/panaroo_out_v3_spliceIntrons_outgroups/ --clean-mode moderate --remove-invalid-genes --merge_paralogs --threads 8
+#singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/outgroup_data/prokka_gff_spliceIntrons/*.gff \
+#-o 092525_pangenome_results/outgroup_data/panaroo_out_v3_spliceIntrons_outgroups/ --clean-mode moderate --remove-invalid-genes --merge_paralogs --threads 8
 
 # output msa files for the outgroup intron-spliced run of panaroo
-singularity exec panaroo_1-5-1.sif panaroo-msa --out_dir 092525_pangenome_results/outgroup_data/panaroo_out_v3_spliceIntrons_outgroups/ --threads 8 --alignment pan --verbose
+#singularity exec panaroo_1-5-1.sif panaroo-msa --out_dir 092525_pangenome_results/outgroup_data/panaroo_out_v3_spliceIntrons_outgroups/ --threads 8 --alignment pan --verbose
+
+
+# run panaroo with a range of less stringent clustering threshold (-f)
+# the default is 0.7
+singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/outgroup_data/prokka_gff_spliceIntrons/*.gff \
+-o 092525_pangenome_results/outgroup_data/threshold_test/panaroo_f0.65/ --clean-mode moderate \
+--remove-invalid-genes --merge_paralogs --threads 8 -f 0.65
+
+singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/outgroup_data/prokka_gff_spliceIntrons/*.gff \
+-o 092525_pangenome_results/outgroup_data/threshold_test/panaroo_f0.60/ --clean-mode moderate \
+--remove-invalid-genes --merge_paralogs --threads 8 -f 0.60
+
+singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/outgroup_data/prokka_gff_spliceIntrons/*.gff \
+-o 092525_pangenome_results/outgroup_data/threshold_test/panaroo_f0.55/ --clean-mode moderate \
+--remove-invalid-genes --merge_paralogs --threads 8 -f 0.55
+
+singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/outgroup_data/prokka_gff_spliceIntrons/*.gff \
+-o 092525_pangenome_results/outgroup_data/threshold_test/panaroo_f0.50/ --clean-mode moderate \
+--remove-invalid-genes --merge_paralogs --threads 8 -f 0.50
+
+singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/outgroup_data/prokka_gff_spliceIntrons/*.gff \
+-o 092525_pangenome_results/outgroup_data/threshold_test/panaroo_f0.45/ --clean-mode moderate \
+--remove-invalid-genes --merge_paralogs --threads 8 -f 0.45
+
+

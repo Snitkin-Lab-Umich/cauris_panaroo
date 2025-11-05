@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#SBATCH --mail-user=jjhale@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=15g
+#SBATCH --time=02:00:00
+
+# biopython conda env needed
+
+#module load Bioinformatics mafft/7.310
+
+python iqtree_scripts/prepare_iqtree_msa.py --input 092525_pangenome_results/outgroup_data/panaroo_out_v3_spliceIntrons_outgroups/aligned_gene_sequences/ \
+--output 092525_pangenome_results/iqtree_v1/iqtree_msa_files_haemuli/ \
+--qc_file 092525_pangenome_results/subset700_data/master_qc_file_PassOnly_v2.csv \
+--outgroup_list CanHae CanDuoHae CanPseudoHae
+

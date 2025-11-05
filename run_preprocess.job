@@ -27,4 +27,4 @@
 #python panaroo_scripts/convert_wrapper_splice_introns.py --output 092525_pangenome_results --skip-copy --introns splice
 
 # prepare panaroo inputs, deleting all cds features that contain introns
-python panaroo_scripts/convert_wrapper_splice_introns.py --output 092525_pangenome_results --skip-copy --introns remove
+#python panaroo_scripts/convert_wrapper_splice_introns.py --output 092525_pangenome_results --skip-copy --introns remove
