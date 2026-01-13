@@ -14,8 +14,20 @@
 
 #module load Bioinformatics mafft/7.310
 
-python iqtree_scripts/prepare_iqtree_msa.py --input 092525_pangenome_results/outgroup_data/panaroo_out_v3_spliceIntrons_outgroups/aligned_gene_sequences/ \
---output 092525_pangenome_results/iqtree_v1/iqtree_msa_files_haemuli/ \
+# python iqtree_scripts/prepare_iqtree_msa.py --input 092525_pangenome_results/outgroup_data/panaroo_out_v3_spliceIntrons_outgroups/aligned_gene_sequences/ \
+# --output 092525_pangenome_results/iqtree_v1/iqtree_msa_files_haemuli/ \
+# --qc_file 092525_pangenome_results/subset700_data/master_qc_file_PassOnly_v2.csv \
+# --outgroup_list CanHae CanDuoHae CanPseudoHae
+
+# use the new script to select only single-copy core genes for iqtree 
+
+source ~/miniconda3/etc/profile.d/conda.sh
+conda activate biopython
+
+python iqtree_scripts/prepare_iqtree_msa_single_copy_core.py --input 092525_pangenome_results/outgroup_data/panaroo_out_v3_spliceIntrons_outgroups/aligned_gene_sequences/ \
+--output 092525_pangenome_results/iqtree_v2/iqtree_msa_files_haemuli/ \
 --qc_file 092525_pangenome_results/subset700_data/master_qc_file_PassOnly_v2.csv \
 --outgroup_list CanHae CanDuoHae CanPseudoHae
+
+
 
