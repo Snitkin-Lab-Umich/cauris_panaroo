@@ -1,0 +1,49 @@
+#!/bin/bash
+
+#SBATCH --mail-user=jjhale@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin1
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=40g
+#SBATCH --time=05:00:00
+
+# All accessory genes
+
+# step 1: make blast input
+# note: this is fine to run on the login node, very few resources needed
+
+source ~/miniconda3/etc/profile.d/conda.sh
+conda activate biopython
+
+python panaroo_scripts/blast_scripts/extract_gene_from_isolate.py --input 092525_pangenome_results/accessory_blast_search/input/accessory_gene_list_all_v2.csv \
+--assemblies 092525_pangenome_results/original_nucleotide_fasta/ --gff 092525_pangenome_results/original_gff/ \
+--pangenome 092525_pangenome_results/accessory_blast_search/input/gene_presence_absence_splice_processed_names_v1.csv \
+--output 092525_pangenome_results/accessory_blast_search/input/extracted_accessory_sequences_all_v2.fasta
+
+# step 2: run blast, making a single blastdb for all assemblies
+# (run this from inside the blast directory)
+
+cd caurisblast/
+
+module load Bioinformatics blast-plus/2.16.0 singularity
+
+python blast.py -q ../092525_pangenome_results/accessory_blast_search/input/extracted_accessory_sequences_all_v2.fasta \
+-s ../092525_pangenome_results/original_nucleotide_fasta/ -th 8 -t nucl -k blastn -n all_pangenome_isolates_v1 -v -e 1e-5 -w 11
+
+cd ../
+
+# step 3: summarize the blast results
+
+python panaroo_scripts/blast_scripts/read_blast.py --input caurisblast/results/all_pangenome_isolates_v1/all_pangenome_isolates_v1_nucl_blastn_1e-5_blast_results.csv \
+--output 092525_pangenome_results/accessory_blast_search/input/accessory_blast_summary_v3.csv
+
+# step 4: compare the blast results with panaroo
+
+python panaroo_scripts/blast_scripts/compare_panaroo_blast.py --blast 092525_pangenome_results/accessory_blast_search/input/accessory_blast_summary_v3.csv \
+--panaroo 092525_pangenome_results/accessory_blast_search/input/gene_presence_absence_splice_processed_names_v1.csv \
+--output 092525_pangenome_results/accessory_blast_search/output/compare_panaroo_blast_accessory_v3.csv
+
+# rename this summary to compare_panaroo_blast_accessory_allclades_v3.csv
