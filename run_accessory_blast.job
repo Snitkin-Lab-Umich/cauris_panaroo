@@ -30,8 +30,12 @@ cd caurisblast/
 
 module load Bioinformatics blast-plus/2.16.0 singularity
 
+# generate blastdb (if needed)
+# python blast.py -q ../092525_pangenome_results/accessory_blast_search/input/extracted_accessory_sequences_all_v2.fasta \
+# -s ../092525_pangenome_results/original_nucleotide_fasta/ -th 8 -t nucl -k blastn -n all_pangenome_isolates_v1 -v -e 1e-5 -w 11
+
 python blast.py -q ../092525_pangenome_results/accessory_blast_search/input/extracted_accessory_sequences_all_v2.fasta \
--s ../092525_pangenome_results/original_nucleotide_fasta/ -th 8 -t nucl -k blastn -n all_pangenome_isolates_v1 -v -e 1e-5 -w 11
+-s db/all_pangenome_isolates_v1/all_pangenome_isolates_v1_blastdb.fasta -th 8 -t nucl -k blastn -n all_pangenome_isolates_v1 -v -e 1e-5 -w 11 -d
 
 cd ../
 

@@ -5,49 +5,20 @@ import argparse
 import gffutils as gff
 import pandas as pd
 
-def extract_sequences(input_file, assemblies_dir, gff_dir, pangenome_file, filterfile, output_file):
-    # steps for each gene family
-    # 1) read the pangenome matrix, get the row that matches the gene family name
-    # 2) get the list of isolates that actually have that gene family
-    # 3) for each isolate, parse the gff file to get the start and end positions of that gene
-    # 4) extract this sequence from the corresponding fasta file
-    # 5) compare the extracted sequences and write the longest/best one to the output file
-    #####
+def extract_sequences(input_file, assemblies_dir, gff_dir, pangenome_file, output_file):
+    # take an input file as a two-column csv, with 'gene_family' containing the family and 'clades' containing a string of the clade data
+    # use the pangenome file to find the gene names for each family, based on the provided isolate name
+    # use the gff file to find the location of each gene
+    # use the assembly fasta file to extract the sequence of each gene
+    # write all of these genes to a single output fasta file
     genefam_data = pd.read_csv(input_file)
     fullpan = pd.read_csv(pangenome_file,keep_default_na=False)
-    # subset pan to only contain columns for the gene family names and isolates
-    fullpan = fullpan.loc[:, fullpan.columns.str.startswith(("Gene", "SRR", "ARR", "DRR", "ERR", "UM_", "Chi_", "b8441"))]
-    # subset pan to only include isolates in the filter file, if provided
-    if filterfile is not None:
-        with open(filterfile, 'r') as fh:
-            filter_list = [line.strip() for line in fh]
-        # always keep the 'Gene' column
-        filter_list.append('Gene')
-        # include only the columns in the filter list
-        pan = fullpan.loc[:, fullpan.columns.isin(filter_list)]
-    else:
-        pan = fullpan
+    pan = fullpan.loc[:, fullpan.columns.str.startswith(("Gene", "SRR", "ARR", "DRR", "ERR", "UM_", "Chi_", "b8441"))]
     with open(output_file, 'w') as out_fasta:
-        for genefam in genefam_data.iloc[:,0]:
-            # if genefam not in pan['Gene'].values:
-            #     print(f'{genefam} not found in pangenome file')
-            #     continue
-            # genefam_row_index = pan[pan['Gene'] == genefam].index[0]
-            # pan_data_series = pan.loc[genefam_row_index]
-            # # create a dictionary of isolate:gene_name for the isolates that have this gene family
-            # isolate_gene_dict = {}
-            # for isolate in pan_data_series.index:
-            #     if isolate == 'Gene':
-            #         continue
-            #     gene_name = pan_data_series[isolate]
-            #     if gene_name == '' or 'refound' in gene_name or 'pseudo' in gene_name:
-            #         continue
-            #     isolate_gene_dict[isolate] = gene_name
+        for index, row in genefam_data.iterrows():
+            genefam = row['gene_family']
+            clade_data = row['clades']
             isolate_gene_dict = make_isolate_dict(genefam, pan)
-            if isolate_gene_dict == {}:
-                print(f'Warning: no searchable genes found in gene family {genefam} for this clade')
-                # use the full pan data to recover the sequence, if it cannot be found within the clade
-                isolate_gene_dict = make_isolate_dict(genefam, fullpan)
             if isolate_gene_dict == {}:
                 print(f'Warning: no searchable genes found in gene family {genefam} at all')
                 continue
@@ -67,7 +38,7 @@ def extract_sequences(input_file, assemblies_dir, gff_dir, pangenome_file, filte
             #print(f'Found gene {query_fasta_record.id} in isolate {isolate} for gene family {genefam}')
             #print(f'gff: {gff_file}, fasta: {fasta_file}, gene_name: {gene_name_mrna}')
             # write the record to the output fasta file
-            query_fasta_record.id = genefam
+            query_fasta_record.id = f'{isolate}_{genefam}_{gene_name_mrna}_{clade_data}'
             query_fasta_record.description = ''
             SeqIO.write(query_fasta_record, out_fasta, 'fasta')
 
@@ -155,17 +126,12 @@ def main():
         default=None
         )
     parser.add_argument(
-        '--filterfile','-ff',type=str,
-        help='''Provide a path to a one-column csv consisting only of isolate names. Only isolates in this file will be used.''',
-        default=None
-        )
-    parser.add_argument(
         '--output','-o',type=str,
         help='''Provide the path to the output file. This will be a fasta file with a single entry for each gene family in the input list.''',
         default=None
         )
     args = parser.parse_args()
-    extract_sequences(args.input, args.assemblies, args.gff, args.pangenome, args.filterfile,args.output)
+    extract_sequences(args.input, args.assemblies, args.gff, args.pangenome, args.output)
 
 
 if __name__ == '__main__':

@@ -2,13 +2,13 @@ import os
 import argparse
 import pandas as pd
 
-def compare_panaroo_blast(panaroo_file, blast_file, filterfile, output_file):
+def compare_panaroo_blast(panaroo_file, blast_file, filterfile, output_file, neighbor_mode=False):
     # read in the gene families that were used to generate the BLAST results
     # genefam_data = pd.read_csv(input_gene_families)
     # read in the panaroo presence/absence matrix
     pandf = read_panaroo_data(panaroo_file, filterfile)
     # read in the BLAST results
-    blastdict = read_blast_data(blast_file)
+    blastdict = read_blast_data(blast_file, neighbor_mode)
     # for each key in blastdict, check if the values match the columns with entries other than ''
     agreedata = {}
     for gene_fam in blastdict:
@@ -30,7 +30,7 @@ def compare_panaroo_blast(panaroo_file, blast_file, filterfile, output_file):
         present_in_blast_only = len([x for x in panaroo_absence if x in blast_presence])
         genefam_agreedata = [present_in_both, absent_in_both, present_in_panaroo_only, present_in_blast_only]
         # print out unexpected cases
-        print(f'Gene family {gene_fam}:')
+        #print(f'Gene family {gene_fam}:')
         # if present_in_panaroo_only > 0:
         #     print(f'Present in Panaroo only:')
         #     print([x for x in panaroo_presence if x not in blast_presence])
@@ -63,14 +63,21 @@ def read_panaroo_data(panaroo_file, filterfile):
         pan = pan.loc[:, pan.columns.isin(filter_list)]
     return pan
 
-def read_blast_data(blast_file):
+def read_blast_data(blast_file, neighbor_mode):
     blastdict = {}
     with open(blast_file, 'r') as fhin:
         next(fhin)
         for line in fhin:
-            query_seqid, subject_seqid = line.strip().split('\t')
+            if neighbor_mode:
+                query_seqid, subject_seqid, neighbor_status = line.strip().split('\t')
+            if not neighbor_mode:
+                query_seqid, subject_seqid = line.strip().split('\t')
+                neighbor_status = 'present'
             if query_seqid not in blastdict:
                 blastdict[query_seqid] = []
+            # for now, simply ignore all cases where the neighbor status is not 'present'
+            if neighbor_status != 'present':
+                continue
             if subject_seqid != 'None':
                 blastdict[query_seqid].append(subject_seqid)
     return blastdict
@@ -99,8 +106,16 @@ def main():
         help='''Provide a file name for the output file.''',
         required=True
         )
+    # add a flag for neighbor mode
+    parser.add_argument(
+        '--neighbor_mode','-n',action='store_true',
+        help='''Add this flag if you included neighbor analysis on the read_blast step.''',
+        required=False,
+        default=False
+        )
+        
     args = parser.parse_args()
-    compare_panaroo_blast(args.panaroo, args.blast, args.filterfile, args.output)
+    compare_panaroo_blast(args.panaroo, args.blast, args.filterfile, args.output, args.neighbor_mode)
 
 
 if __name__ == '__main__':

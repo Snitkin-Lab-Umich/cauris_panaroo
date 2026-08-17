@@ -48,8 +48,17 @@ module load singularity
 
 
 # run panaroo on the dataset that includes haemuli outgroups
-singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/outgroup_data/prokka_gff_spliceIntrons/*.gff \
--o 092525_pangenome_results/outgroup_data/panaroo_out_v3_spliceIntrons_outgroups/ --clean-mode moderate --remove-invalid-genes --merge_paralogs --threads 8
+# singularity exec panaroo_1-5-1.sif panaroo -i 092525_pangenome_results/outgroup_data/prokka_gff_spliceIntrons/*.gff \
+# -o 092525_pangenome_results/outgroup_data/panaroo_out_v3_spliceIntrons_outgroups/ --clean-mode moderate --remove-invalid-genes --merge_paralogs --threads 8
 
 # output msa files for the outgroup intron-spliced run of panaroo
-singularity exec panaroo_1-5-1.sif panaroo-msa --out_dir 092525_pangenome_results/outgroup_data/panaroo_out_v3_spliceIntrons_outgroups/ --threads 8 --alignment pan --verbose
+# singularity exec panaroo_1-5-1.sif panaroo-msa --out_dir 092525_pangenome_results/outgroup_data/panaroo_out_v3_spliceIntrons_outgroups/ --threads 8 --alignment pan --verbose
+
+
+# have panaroo output the gff files with refound genes for the intron-spliced run without the outgroups
+# use panaroo 1.6.0 for this, since it fixes an apparent issue with gff incompatability
+singularity exec panaroo_1-6-0.sif panaroo-generate-gffs -i 092525_pangenome_results/prokka_gff_spliceIntrons/*.gff \
+-o 092525_pangenome_results/panaroo_out_v2_spliceIntrons/ --threads 8 -f prokka --verbose
+
+
+

@@ -28,6 +28,10 @@ module load singularity
 # --seqtype DNA --mem 100G -T AUTO --safe -o CanHae,CanDuoHae,CanPseudoHae
 
 # re-run iqtree on only the single-copy core gene msas from the haemuli panaroo run
-singularity exec iqtree2_2-4-0.sif iqtree2 -s 092525_pangenome_results/iqtree_v2/iqtree_msa_files_haemuli/ \
---seqtype DNA --mem 100G -T AUTO --safe -o CanHae,CanDuoHae,CanPseudoHae
+# singularity exec iqtree2_2-4-0.sif iqtree2 -s 092525_pangenome_results/iqtree_v2/iqtree_msa_files_haemuli/ \
+# --seqtype DNA --mem 100G -T AUTO --safe -o CanHae,CanDuoHae,CanPseudoHae
 
+# run iqtree on the existing haemuli tree, adding bootstrap values
+singularity exec iqtree2_2-4-0.sif iqtree2 -s 092525_pangenome_results/iqtree_v2/added_bootstrap/iqtree_msa_files_haemuli_added_bootstrap/ \
+--seqtype DNA --mem 100G -T AUTO --safe -o CanHae,CanDuoHae,CanPseudoHae -m GTR+F+I+R9 -B 1000 \
+-t 092525_pangenome_results/iqtree_v2/added_bootstrap/iqtree_msa_files_haemuli.treefile
